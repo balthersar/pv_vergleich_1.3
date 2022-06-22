@@ -27,25 +27,30 @@ function PVModule() {
   
   
   const addPVModul = () => {
-    Axios.post("http://localhost:3001/create", {
-      hersteller: hersteller,
-      typ: typ,
-      maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
-      maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
-      maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
-    }).then(() => {
-      setEmployeeList([
-        ...employeeList,
-        {
-          hersteller: hersteller,
-          typ: typ,
-          maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
-          maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
-          maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
-        },
-      ]);
-      sethersteller([]);
+    Axios.get("http://localhost:3001/employeesHeader").then((response) => {
+      setEmployeeHeaderList(response.data);
+
     });
+    console.log(employeeHeaderList)
+    // Axios.post("http://localhost:3001/create", {
+    //   hersteller: hersteller,
+    //   typ: typ,
+    //   maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
+    //   maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
+    //   maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
+    // }).then(() => {
+    //   setEmployeeList([
+    //     ...employeeList,
+    //     {
+    //       hersteller: hersteller,
+    //       typ: typ,
+    //       maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
+    //       maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
+    //       maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
+    //     },
+    //   ]);
+    //   sethersteller([]);
+    // });
   };
 
   const getEmployees = () => {
