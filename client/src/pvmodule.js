@@ -6,14 +6,6 @@ import Modal from 'react-modal';
 
 
 function PVModule() {
-  const [hersteller, sethersteller] = useState("");
-  const [typ, setTyp] = useState(0);
-  const [maximale_Modulleistung_Wp, setMaximale_Modulleistung_Wp] = useState("");
-  const [maximale_Modulspannung_Vp, setMaximale_Modulspannung_Vp] = useState("");
-  const [maximale_Modulstrom_Ap_IMPPSTC, setMaximale_Modulstrom_Ap_IMPPSTC] = useState(0);
-
-  const [newWage, setNewWage] = useState(0);
-
   const [employeeList, setEmployeeList] = useState([]);
   const [employeeHeaderList, setEmployeeHeaderList] = useState([]);
 
@@ -21,36 +13,58 @@ function PVModule() {
   const [currentPVModulIsOpen, setCurrentPVModulIsOpen] = useState([{ id: 'test' }, { id: 'test' }]);
   const [updateCurrentPVModulIsOpen, setUpdateCurrentPVModulIsOpen] = useState([]);
 
+  const [addPVModulObjectList, setAddPVModulObjectList] = useState([]);
+  const [addPVModulHeaderList, setAddPVModulHeaderList] = useState([]);
+  const [addPVModulValueList, setAddPVModulValueList] = useState([]);
+
+  const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
+  //const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
+  var newId = 0;
+
+  //open table on Load page first time
+  useEffect(() => {
+    getEmployees();
+  }, []);
 
   const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
     first.toLocaleUpperCase(locale) + rest.join('')
   
-  
-  const addPVModul = () => {
-    Axios.get("http://localhost:3001/employeesHeader").then((response) => {
-      setEmployeeHeaderList(response.data);
+  const addPVModul = (event, value, key) => {
+    setAddPVModulObjectList({ ...addPVModulObjectList, [value.Field]: event });
+  };
 
+  const submitAddPVModul = () => {
+    setAddPVModulHeaderList([])
+    setAddPVModulValueList([])
+    console.log("Neues versuch")
+    Object.entries(addPVModulObjectList).map((value, index) => {
+      console.log("Index", index )
+      if (index == 0) {
+        Axios.post("http://localhost:3001/createWithOneParameter", {
+          key: value[0],
+          value: value[1]
+        }).then((response) =>
+          //console.log("Repsonsedata=", response.data.insertId)
+          console.log("Reponse Insert", response.data.insertId),
+          // newId = response.data.insertId,
+          console.log("New ID", newId)
+        )
+      } else {
+        console.log(newId)
+        console.log(value[0])
+        console.log(value[1])
+        Axios.put("http://localhost:3001/update", { id: newId, key: value[0], value: value[1] })
+        
+      }
+      setAddPVModulHeaderList(
+        addPVModulHeaderList => (
+          [...addPVModulHeaderList, value[0]])
+      );
+      setAddPVModulValueList(
+        addPVModulValueList => (
+          [...addPVModulValueList, value[1]])
+      );
     });
-    console.log(employeeHeaderList)
-    // Axios.post("http://localhost:3001/create", {
-    //   hersteller: hersteller,
-    //   typ: typ,
-    //   maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
-    //   maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
-    //   maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
-    // }).then(() => {
-    //   setEmployeeList([
-    //     ...employeeList,
-    //     {
-    //       hersteller: hersteller,
-    //       typ: typ,
-    //       maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
-    //       maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
-    //       maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
-    //     },
-    //   ]);
-    //   sethersteller([]);
-    // });
   };
 
   const getEmployees = () => {
@@ -99,10 +113,7 @@ function PVModule() {
     });
   };
 
-  //open table on Load page first time
-  useEffect(() => {
-    getEmployees();
-  }, []);
+
 
   return (
     <PVModuleWrapper>
@@ -117,7 +128,13 @@ function PVModule() {
                   return (
                     <td class="col-xs-4">{employeeList[key][(headerval.Field)]}</td>)
               })}
-              <td><input type="text"/></td>
+              <td>
+                <input type="text"
+                  onChange={(event) => {
+                    addPVModul(event.target.value, headerval, headerkey);
+                  }}
+                />
+              </td>
 
               
             </tr>)
@@ -137,7 +154,7 @@ function PVModule() {
             </td>);
             })}
             <td class="col-xs-4">
-              <button onClick={addPVModul}>Neues Modul</button>
+              <button onClick={submitAddPVModul}>Neues Modul</button>
             </td>
           </tr>
       </table> 
@@ -216,7 +233,7 @@ td {
 th {
       background-color: #f1f3f4;
       font-weight: 700;
-      width: 20rem;
+      width: 7rem;
 }
 input {
 

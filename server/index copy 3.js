@@ -14,17 +14,21 @@ const db = mysql.createConnection({
     
 })
 
-app.post("/createWithOneParameter", (req, res) => {
-  const key = req.body.key;
-  const value = req.body.value;
+app.post("/create", (req, res) => {
+  const hersteller = req.body.hersteller;
+  const typ = req.body.typ;
+  const maximale_Modulleistung_Wp = req.body.maximale_Modulleistung_Wp;
+  const maximale_Modulspannung_Vp = req.body.maximale_Modulspannung_Vp;
+  const maximale_Modulstrom_Ap_IMPPSTC = req.body.maximale_Modulstrom_Ap_IMPPSTC;
+
   db.query(
-    "INSERT INTO pvmodule(??) VALUES (?)",
-    [key, value],
+    "INSERT INTO pvmodule (hersteller, typ, maximale_Modulleistung_Wp, maximale_Modulspannung_Vp, maximale_Modulstrom_Ap_IMPPSTC) VALUES (?,?,?,?,?)",
+    [hersteller, typ, maximale_Modulleistung_Wp, maximale_Modulspannung_Vp, maximale_Modulstrom_Ap_IMPPSTC],
     (err, result) => {
       if (err) {
         console.log(err);
       } else {
-        res.send(result);
+        res.send("Values Inserted");
       }
     }
   );
