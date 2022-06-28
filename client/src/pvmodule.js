@@ -19,7 +19,8 @@ function PVModule() {
 
   const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
   //const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
-  var newId = 0;
+  const [newID, setNewID] = useState();
+  let response
 
   //open table on Load page first time
   useEffect(() => {
@@ -33,39 +34,25 @@ function PVModule() {
     setAddPVModulObjectList({ ...addPVModulObjectList, [value.Field]: event });
   };
 
+  
   const submitAddPVModul = () => {
-    setAddPVModulHeaderList([])
-    setAddPVModulValueList([])
-    console.log("Neues versuch")
-    Object.entries(addPVModulObjectList).map((value, index) => {
-      console.log("Index", index )
-      if (index == 0) {
-        Axios.post("http://localhost:3001/createWithOneParameter", {
-          key: value[0],
-          value: value[1]
-        }).then((response) =>
-          //console.log("Repsonsedata=", response.data.insertId)
-          console.log("Reponse Insert", response.data.insertId),
-          // newId = response.data.insertId,
-          console.log("New ID", newId)
-        )
-      } else {
-        console.log(newId)
-        console.log(value[0])
-        console.log(value[1])
-        Axios.put("http://localhost:3001/update", { id: newId, key: value[0], value: value[1] })
-        
-      }
-      setAddPVModulHeaderList(
-        addPVModulHeaderList => (
-          [...addPVModulHeaderList, value[0]])
-      );
-      setAddPVModulValueList(
-        addPVModulValueList => (
-          [...addPVModulValueList, value[1]])
-      );
+    var keys = Object.keys(addPVModulObjectList);
+    var values = Object.values(addPVModulObjectList)
+    Axios.post("http://localhost:3001/createWithList", {
+      key: keys,
+      value: values
+    }).then(() => {
+      setEmployeeList([
+        ...employeeList,
+        addPVModulObjectList,
+      ]);
+      getEmployees()
     });
+
+
   };
+
+
 
   const getEmployees = () => {
     Axios.get("http://localhost:3001/employees").then((response) => {
@@ -161,12 +148,16 @@ function PVModule() {
       
       <div className="employees">
         
-        <button onClick={getEmployees}>Show Employees</button>
+        {/* <button onClick={getEmployees}>Show Employees</button> */}
         
         
         <Modal isOpen={ModalIsOpen} ariaHideApp={false}>
           
           <button onClick={closeModal}>close</button>
+          <button onClick={() => {
+            deleteEmployee(currentPVModulIsOpen.id);
+              closeModal();
+                }}>PV-Modul löschen</button>
           <div>PV-Modul bearbeiten</div>
           <table>
             <tr >
@@ -200,13 +191,7 @@ function PVModule() {
                   </tr>
                 );
               }})}
-              
-
-            
-
           </table>
-
-
         </Modal>
       </div>
     </PVModuleWrapper>
@@ -219,12 +204,21 @@ export default PVModule;
 const PVModuleWrapper = styling.nav`
     margin-top:4rem;
     overflow:hidden;
-    
-table, th, td, caption {
-      border: thin solid #a0a0a0;
+table{
+  border-collapse: collapse;
+  border: 1px solid black;
+  text-align: center;
+	vertical-align: middle;
+  margin-left: 2rem;
+}
+table, th, td {
+
       background-color: #f1f3f4;
 }
-
+th, td{
+  
+  padding: 8px;
+}
 td {
       font-weight: normal;
 

@@ -14,7 +14,7 @@ const db = mysql.createConnection({
     
 })
 
-app.post("/createWithOneParameter", (req, res) => {
+app.post("/createWithList", (req, res) => {
   const key = req.body.key;
   const value = req.body.value;
   db.query(
@@ -29,6 +29,22 @@ app.post("/createWithOneParameter", (req, res) => {
     }
   );
 });
+
+// app.post("/createWithOneParameter", (req, res) => {
+//   const key = req.body.key;
+//   const value = req.body.value;
+//   db.query(
+//     "INSERT INTO pvmodule(??) VALUES (?)",
+//     [key, value],
+//     (err, result) => {
+//       if (err) {
+//         console.log(err);
+//       } else {
+//         res.send(result);
+//       }
+//     }
+//   );
+// });
 
 app.get("/employees", (req, res) => {
   db.query("SELECT * FROM pvmodule", (err, result) => {

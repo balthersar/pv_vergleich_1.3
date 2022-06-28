@@ -1,19 +1,11 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Axios from "axios";
 import styling from 'styled-components';
 import Modal from 'react-modal';
 
 
 function PVModule() {
-  const [hersteller, sethersteller] = useState("");
-  const [typ, setTyp] = useState(0);
-  const [maximale_Modulleistung_Wp, setMaximale_Modulleistung_Wp] = useState("");
-  const [maximale_Modulspannung_Vp, setMaximale_Modulspannung_Vp] = useState("");
-  const [maximale_Modulstrom_Ap_IMPPSTC, setMaximale_Modulstrom_Ap_IMPPSTC] = useState(0);
-
-  const [newWage, setNewWage] = useState(0);
-
   const [employeeList, setEmployeeList] = useState([]);
   const [employeeHeaderList, setEmployeeHeaderList] = useState([]);
 
@@ -21,32 +13,46 @@ function PVModule() {
   const [currentPVModulIsOpen, setCurrentPVModulIsOpen] = useState([{ id: 'test' }, { id: 'test' }]);
   const [updateCurrentPVModulIsOpen, setUpdateCurrentPVModulIsOpen] = useState([]);
 
+  const [addPVModulObjectList, setAddPVModulObjectList] = useState([]);
+  const [addPVModulHeaderList, setAddPVModulHeaderList] = useState([]);
+  const [addPVModulValueList, setAddPVModulValueList] = useState([]);
+
+  const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
+  //const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
+  const [newID, setNewID] = useState();
+  let response
+
+  //open table on Load page first time
+  useEffect(() => {
+    getEmployees();
+  }, []);
 
   const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
     first.toLocaleUpperCase(locale) + rest.join('')
   
+  const addPVModul = (event, value, key) => {
+    setAddPVModulObjectList({ ...addPVModulObjectList, [value.Field]: event });
+  };
+
   
-  const addEmployee = () => {
-    Axios.post("http://localhost:3001/create", {
-      hersteller: hersteller,
-      typ: typ,
-      maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
-      maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
-      maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
+  const submitAddPVModul = () => {
+    var keys = Object.keys(addPVModulObjectList);
+    var values = Object.values(addPVModulObjectList)
+    Axios.post("http://localhost:3001/createWithList", {
+      key: keys,
+      value: values
     }).then(() => {
       setEmployeeList([
         ...employeeList,
-        {
-          hersteller: hersteller,
-          typ: typ,
-          maximale_Modulleistung_Wp: maximale_Modulleistung_Wp,
-          maximale_Modulspannung_Vp: maximale_Modulspannung_Vp,
-          maximale_Modulstrom_Ap_IMPPSTC: maximale_Modulstrom_Ap_IMPPSTC,
-        },
+        addPVModulObjectList,
       ]);
-      sethersteller([]);
+      getEmployees()
     });
+
+
   };
+
+
 
   const getEmployees = () => {
     Axios.get("http://localhost:3001/employees").then((response) => {
@@ -94,8 +100,11 @@ function PVModule() {
     });
   };
 
+
+
   return (
     <PVModuleWrapper>
+      
       <table>
         {employeeHeaderList.slice(1).map((headerval, headerkey) => {
 
@@ -106,13 +115,20 @@ function PVModule() {
                   return (
                     <td class="col-xs-4">{employeeList[key][(headerval.Field)]}</td>)
               })}
+              <td>
+                <input type="text"
+                  onChange={(event) => {
+                    addPVModul(event.target.value, headerval, headerkey);
+                  }}
+                />
+              </td>
 
               
             </tr>)
           
         })}
         <tr class="row">
-            <th class="col-xs-4">Update</th>
+            <th class="col-xs-4">Bearbeiten</th>
             {employeeList.map((val, key) => {
             return (<td class="col-xs-4">
               <button
@@ -120,24 +136,28 @@ function PVModule() {
                   openModal(key)
                 }}
               >
-                Update
+                Bearbeiten
               </button>
             </td>);
             })}
             <td class="col-xs-4">
-              <button onClick={addEmployee}>Neues Modul</button>
+              <button onClick={submitAddPVModul}>Neues Modul</button>
             </td>
           </tr>
       </table> 
       
       <div className="employees">
         
-        <button onClick={getEmployees}>Show Employees</button>
+        {/* <button onClick={getEmployees}>Show Employees</button> */}
         
         
         <Modal isOpen={ModalIsOpen} ariaHideApp={false}>
           
           <button onClick={closeModal}>close</button>
+          <button onClick={() => {
+            deleteEmployee(currentPVModulIsOpen.id);
+              closeModal();
+                }}>PV-Modul löschen</button>
           <div>PV-Modul bearbeiten</div>
           <table>
             <tr >
@@ -171,13 +191,7 @@ function PVModule() {
                   </tr>
                 );
               }})}
-              
-
-            
-
           </table>
-
-
         </Modal>
       </div>
     </PVModuleWrapper>
@@ -190,21 +204,30 @@ export default PVModule;
 const PVModuleWrapper = styling.nav`
     margin-top:4rem;
     overflow:hidden;
-    
-table, th, td, caption {
-      border: thin solid #a0a0a0;
+table{
+  border-collapse: collapse;
+  border: 1px solid black;
+  text-align: center;
+	vertical-align: middle;
+  margin-left: 2rem;
+}
+table, th, td {
+
       background-color: #f1f3f4;
 }
-
-th, td {
+th, td{
+  
+  padding: 8px;
+}
+td {
       font-weight: normal;
 
-      width: 5rem;
+      width: 7rem;
 }
-th, caption {
+th {
       background-color: #f1f3f4;
       font-weight: 700;
-      width: 14rem;
+      width: 7rem;
 }
 input {
 
