@@ -96,9 +96,36 @@ app.put("/update", (req, res) => {
   );
 });
 
+app.put("/addColumn", (req, res) => {
+  const name = req.body.name;
+  const type = req.body.type;
+  var sql = "ALTER TABLE pvmodule ADD COLUMN " + name + " " + type
+  db.query(
+    sql,
+    [name, type],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
+
 app.delete("/delete/:id", (req, res) => {
   const id = req.params.id;
   db.query("DELETE FROM pvmodule WHERE id = ?", id, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+});
+app.delete("/deleteParameter/:parameter", (req, res) => {
+  const parameter = req.params.parameter;
+  db.query("ALTER TABLE pvmodule DROP ??", parameter, (err, result) => {
     if (err) {
       console.log(err);
     } else {
