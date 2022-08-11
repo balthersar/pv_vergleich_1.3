@@ -113,6 +113,24 @@ app.put("/addColumn", (req, res) => {
   );
 });
 
+app.put("/changeColumnName", (req, res) => {
+  const oldName = req.body.oldName;
+  const newName = req.body.newName;
+  const newDatatype = req.body.newDatatype;
+  var sql = "ALTER TABLE pvmodule CHANGE " + oldName + " " + newName + " " + newDatatype
+  db.query(
+    sql,
+    [oldName, newName, newDatatype],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
+
 app.delete("/delete/:id", (req, res) => {
   const id = req.params.id;
   db.query("DELETE FROM pvmodule WHERE id = ?", id, (err, result) => {
