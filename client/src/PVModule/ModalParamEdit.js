@@ -8,10 +8,10 @@ export default function ModalParamEdit(props) {
 
   const { ParamEditIsOpen,
     closeParamEdit,
-    employeeHeaderList,
+    pvmoduleHeaderList,
     regExp,
-    setEmployeeHeaderList,
-    getEmployees,
+    setpvmoduleHeaderList,
+    getpvmodules,
     capitalizeFirstLetter} = props
 
   //Modal Parameter
@@ -69,8 +69,8 @@ export default function ModalParamEdit(props) {
 
     Axios.put("http://localhost:3001/addColumn", { name: nameNewParameter, type: datatypeNewParameter }).then(
       (response) => {
-        setEmployeeHeaderList(employeeHeaderList, { Field: [nameNewParameter], Type: [datatypeNewParameter] })
-        getEmployees();
+        setpvmoduleHeaderList(pvmoduleHeaderList, { Field: [nameNewParameter], Type: [datatypeNewParameter] })
+        getpvmodules();
       }
     )
     
@@ -98,8 +98,8 @@ export default function ModalParamEdit(props) {
       Axios.put("http://localhost:3001/changeColumnName", { oldName: currentName, newName: nameNewParameter, newDatatype: datatypeNewParameter}).then(
         (response) => {
           ;
-          //setEmployeeHeaderList(employeeHeaderList, { Field: [nameNewParameter], Type: [datatypeNewParameter] })
-          getEmployees();
+          //setpvmoduleHeaderList(pvmoduleHeaderList, { Field: [nameNewParameter], Type: [datatypeNewParameter] })
+          getpvmodules();
         }
       )
     } else {
@@ -108,8 +108,8 @@ export default function ModalParamEdit(props) {
   }
   const submitdeleteParameter = (parameter) => {
     Axios.delete(`http://localhost:3001/deleteParameter/${parameter}`).then((response) => {
-      setEmployeeHeaderList(
-        employeeHeaderList.filter((val) => {
+      setpvmoduleHeaderList(
+        pvmoduleHeaderList.filter((val) => {
           return val.Field != parameter;
         })
       );
@@ -129,7 +129,7 @@ export default function ModalParamEdit(props) {
               <th>Nachkommastellen</th>
             </tr>
            
-            {employeeHeaderList.slice(1).map((headerval, headerkey) => {
+            {pvmoduleHeaderList.slice(1).map((headerval, headerkey) => {
               var matches = regExp.exec(headerval.Type);
               //matches[1] contains the value between the parentheses
               let paramlength = matches[1].split(",")[0]

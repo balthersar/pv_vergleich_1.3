@@ -1,13 +1,18 @@
-import React, { Component } from 'react';
+
+import React, {useContext, useEffect, useState} from "react";
 import {Link} from 'react-router-dom';
 import styling from 'styled-components';
+import Axios from "axios";
+import { AuthContext, AuthContextProvider } from "./authContext";
 
 
 
-export default class Navbar extends Component{
-    render() {
-        
-        const navslide = () => {
+function Navbar() {
+    
+    const [loginName, setLoginName] = useState('');
+    const { loginStatus , logout} = useContext(AuthContext);
+
+    const navslide = () => {
             const burger = document.querySelector(".burger");
             const nav = document.querySelector(".nav-links");
             const navLinks = document.querySelectorAll(".nav-links li");
@@ -25,8 +30,9 @@ export default class Navbar extends Component{
               burger.classList.toggle("toggle");
             };
 
-        return (
-            
+
+    
+    return (
             <NavWrapper className="navbar  navbar-dark px-sm-2">
                 <div className="burger" onClick={navslide}>
                     <div className="line1"></div>
@@ -52,14 +58,30 @@ export default class Navbar extends Component{
                         <li className="nav-item ">
                             <Link to="/anlage" className="nav-link" onClick={navslide}>Anlage</Link>
                         </li>
+                        {/* <li className="nav-item ">
+                                    <Link to="/login" className="nav-link" onClick={navslide}>Login</Link>
+                        </li> */}
+                        {loginStatus ? (
+                            <li className="nav-item ">
+                                <Link to="/login" onClick={logout}>
+                                    <h6>Ausloggen</h6>
+                                </Link>
+                            </li>
+                            ) : (
+                                <li className="nav-item ">
+                                    <Link to="/login" className="nav-link" onClick={navslide}>Login</Link>
+                                </li>
+                            )
+                        }
                     </div>
 
                 </ul>
 
             </NavWrapper>
-        )
-    }
+    )
 }
+
+export default Navbar;
 
 const NavWrapper = styling.nav`
     background: var(--lightBlue);

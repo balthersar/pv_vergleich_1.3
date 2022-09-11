@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import Navbar from './navbar.js';
 import Default from './default.js';
 import PVModule from './PVModule/pvmodule.js';
-import UpdatePVModule from './updatepvmodule.js';
+import Login from './Login/login.js';
 
 function App() {
   return <React.Fragment>
@@ -14,6 +14,7 @@ function App() {
    
       <Route path="/" element={<PVModule />} />
       <Route path="/pvmodule" element={<PVModule />} />
+      <Route path="/login" element={<Login />} />
       <Route component={Default} />
     </Routes>
 

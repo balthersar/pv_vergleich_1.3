@@ -6,14 +6,17 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import ScrollToTop from './scrolltop';
 import "bootstrap/dist/css/bootstrap.min.css"
+import {AuthProvider} from './authContext';
 
 
 ReactDOM.render(
+  <AuthProvider>
     <Router>
     <ScrollToTop/>
       <App />
   
     </Router>
+  </AuthProvider>
   ,
   document.getElementById('root')
 );

@@ -1,141 +1,126 @@
 import "../App.css";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect} from "react";
 import Axios from "axios";
 import styling from 'styled-components';
 import Modal from 'react-modal';
 import ModalParamEdit from "./ModalParamEdit";
-import Select from 'react-select';
+
 
 function PVModule() {
-  const [employeeList, setEmployeeList] = useState([]);
-  const [employeeHeaderList, setEmployeeHeaderList] = useState([]);
+// #region useState / Var-Definitions
+  const [pvmoduleList, setpvmoduleList] = useState([]);
+  const [pvmoduleHeaderList, setpvmoduleHeaderList] = useState([]);
 
   const [PVModulEditIsOpen, setPVModulEditIsOpen] = useState(false);
  
-  
   const [currentPVModulIsOpen, setCurrentPVModulIsOpen] = useState([{ id: 'test' }, { id: 'test' }]);
   const [updateCurrentPVModulIsOpen, setUpdateCurrentPVModulIsOpen] = useState([]);
 
-
-
-
   const [addPVModulObjectList, setAddPVModulObjectList] = useState([]);
-  const [addPVModulHeaderList, setAddPVModulHeaderList] = useState([]);
-  const [addPVModulValueList, setAddPVModulValueList] = useState([]);
 
-  const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
-  //const [employeeHeaderListToList, setEmployeeHeaderListToList] = useState([]);
-  const [newID, setNewID] = useState();
-  let response
-  var regExp = /\(([^)]+)\)/;
+  const regExp = /\(([^)]+)\)/;
+// #endregion END useState / Var-Definitions
 
-  //open table on Load page first time
-  useEffect(() => {
-    getEmployees();
-  }, []);
+// #region FUNCTIONS:
+    //open table on Load page first time
+    useEffect(() => {
+      getpvmodules();
+    }, []);
 
-  const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
-    first.toLocaleUpperCase(locale) + rest.join('')
-  
-
-  const addPVModul = (event, value, key) => {
-    setAddPVModulObjectList({ ...addPVModulObjectList, [value.Field]: event });
-  };
-
-  
-  const submitAddPVModul = () => {
-    var keys = Object.keys(addPVModulObjectList);
-    var values = Object.values(addPVModulObjectList)
-    Axios.post("http://localhost:3001/createWithList", {
-      key: keys,
-      value: values
-    }).then(() => {
-      setEmployeeList([
-        ...employeeList,
-        addPVModulObjectList,
-      ]);
-      getEmployees()
-    });
-
-
-  };
-
-
-
-  const getEmployees = () => {
-    Axios.get("http://localhost:3001/employees").then((response) => {
-      setEmployeeList(response.data);
-
-    });
-    Axios.get("http://localhost:3001/employeesHeader").then((response) => {
-      setEmployeeHeaderList(response.data);
-
-    });
+    const capitalizeFirstLetter = ([ first, ...rest ], locale = navigator.language) =>
+      first.toLocaleUpperCase(locale) + rest.join('')
+    
+    const addPVModul = (event, value, key) => {
+      setAddPVModulObjectList({ ...addPVModulObjectList, [value.Field]: event });
+    };
 
     
-  };
-  const updateCurrentPVModul = (event, index, key) => {
-    setUpdateCurrentPVModulIsOpen({ ...updateCurrentPVModulIsOpen, [key]: event });
-  }
-  const submitUpdateCurrentPVModule = (key, index, id) => {
-    Axios.put("http://localhost:3001/update", { id: id, key: key, value: Object.entries(updateCurrentPVModulIsOpen)[index][1] }).then(
-      (response) => {
-        setCurrentPVModulIsOpen({ ...currentPVModulIsOpen, [key]: Object.entries(updateCurrentPVModulIsOpen)[index][1] })
-        getEmployees();
+    const submitAddPVModul = () => {
+      var keys = Object.keys(addPVModulObjectList);
+      var values = Object.values(addPVModulObjectList)
+      Axios.post("http://localhost:3001/createWithList", {
+        key: keys,
+        value: values
+      }).then(() => {
+        setpvmoduleList([
+          ...pvmoduleList,
+          addPVModulObjectList,
+        ]);
+        getpvmodules()
+      });
 
-      }
-    )
-  }
-  // Modal Parameter
-  const [ParamEditIsOpen, setParamEditIsOpen] = useState(false);
 
-  function openParamEdit() {
-    setParamEditIsOpen(true);
-  }
-  function closeParamEdit() {
-    setParamEditIsOpen(false);
-  }
+    };
+    const getpvmodules = () => {
+      Axios.get("http://localhost:3001/pvmodules").then((response) => {
+        setpvmoduleList(response.data);
+
+      });
+      Axios.get("http://localhost:3001/pvmodulesHeader").then((response) => {
+        setpvmoduleHeaderList(response.data);
+
+      });
+    };
+    
+    const updateCurrentPVModul = (event, index, key) => {
+      setUpdateCurrentPVModulIsOpen({ ...updateCurrentPVModulIsOpen, [key]: event });
+    }
+    const submitUpdateCurrentPVModule = (key, index, id) => {
+      Axios.put("http://localhost:3001/update", { id: id, key: key, value: Object.entries(updateCurrentPVModulIsOpen)[index][1] }).then(
+        (response) => {
+          setCurrentPVModulIsOpen({ ...currentPVModulIsOpen, [key]: Object.entries(updateCurrentPVModulIsOpen)[index][1] })
+          getpvmodules();
+
+        }
+      )
+    }
+    // Modal Parameter Edit
+    const [ParamEditIsOpen, setParamEditIsOpen] = useState(false);
+
+    function openParamEdit() {
+      setParamEditIsOpen(true);
+    }
+    function closeParamEdit() {
+      setParamEditIsOpen(false);
+    }
+  //END Modal Parameter Edit
+    
+    // Modal PVModul Edit
+    function openPVModulEdit(key) {
+      setPVModulEditIsOpen(true);
+      setCurrentPVModulIsOpen(pvmoduleList[key])
+      setUpdateCurrentPVModulIsOpen(pvmoduleList[key])
+    }
+
+    function closePVModulEdit() {
+      setPVModulEditIsOpen(false);
+    }
+
+    const deletepvmodule = (id) => {
+      Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
+        setpvmoduleList(
+          pvmoduleList.filter((val) => {
+            return val.id !== id;
+          })
+        );
+      });
+    };
+  // End Modal PVModul Edit
+
+// #endregion END FUNCTIONS:
   
- //END Modal Parameter
-  
-  // Modal PVModul
-  function openPVModulEdit(key) {
-    setPVModulEditIsOpen(true);
-    setCurrentPVModulIsOpen(employeeList[key])
-    setUpdateCurrentPVModulIsOpen(employeeList[key])
-  }
-
-  function closePVModulEdit() {
-    setPVModulEditIsOpen(false);
-  }
-
-
-
-  const deleteEmployee = (id) => {
-    Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
-      setEmployeeList(
-        employeeList.filter((val) => {
-          return val.id != id;
-        })
-      );
-    });
-  };
-
-
-
-
   return (
     <PVModuleWrapper>
       
       <table>
-        {employeeHeaderList.slice(1).map((headerval, headerkey) => {
+        {pvmoduleHeaderList.slice(1).map((headerval, headerkey) => {
 
           return (
             <tr class="row">
               <th class="col-xs-4">{capitalizeFirstLetter(headerval.Field).replace(/_/g, ' ')}</th>
-              {employeeList.map((value, key) => {
+              {pvmoduleList.map((value, key) => {
                   return (
-                    <td class="col-xs-4">{employeeList[key][(headerval.Field)]}</td>)
+                    <td class="col-xs-4">{pvmoduleList[key][(headerval.Field)]}</td>)
               })}
               <td>
                 <input type="text"
@@ -157,7 +142,7 @@ function PVModule() {
               >
                 Parameter Bearbeiten
               </button></th>
-            {employeeList.map((val, key) => {
+            {pvmoduleList.map((val, key) => {
             return (<td class="col-xs-4">
               <button
                 onClick={() => {
@@ -174,16 +159,16 @@ function PVModule() {
           </tr>
       </table> 
       
-      <div className="employees">
+      <div className="pvmodules">
         
-        {/* <button onClick={getEmployees}>Show Employees</button> */}
+        {/* <button onClick={getpvmodules}>Show pvmodules</button> */}
         
         
         <Modal  isOpen={PVModulEditIsOpen} ariaHideApp={false} classname="ModalPVModulEdit">
           
           <button onClick={closePVModulEdit}>close</button>
           <button onClick={() => {
-            deleteEmployee(currentPVModulIsOpen.id);
+            deletepvmodule(currentPVModulIsOpen.id);
               closePVModulEdit();
                 }}>PV-Modul löschen</button>
           <div>PV-Modul bearbeiten</div>
@@ -225,10 +210,10 @@ function PVModule() {
         <ModalParamEdit
           ParamEditIsOpen={ParamEditIsOpen}
           closeParamEdit={closeParamEdit}
-          employeeHeaderList={employeeHeaderList}
+          pvmoduleHeaderList={pvmoduleHeaderList}
           regExp={regExp}
-          setEmployeeHeaderList={setEmployeeHeaderList}
-          getEmployees={getEmployees}
+          setpvmoduleHeaderList={setpvmoduleHeaderList}
+          getpvmodules={getpvmodules}
           capitalizeFirstLetter={capitalizeFirstLetter}
         />
 
